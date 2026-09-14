@@ -1,0 +1,62 @@
+services:
+
+  spring:
+    build: .  # 우리가 작성한 Dockerfile을 빌드한 이미지를 사용(.은 dockerfile의 위치)
+    container_name: my-spring
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - .env
+    depends_on: # redis 서비스가 먼저 시작된 후 app 시작
+      - redis
+
+  # Redis
+  redis:
+    image: redis:7.0
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data/redis
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: my-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: my-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
+    volumes:
+      - grafana_data:/data/grafana
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  grafana_data:
+  redis_data:

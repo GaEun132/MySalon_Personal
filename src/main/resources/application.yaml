@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: shopping
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "${DB_URL}"
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+    hikari:
+      maximum-pool-size: 32
+  data:
+    redis:
+      host: redis
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        highlight_sql: true
+        default_batch_fetch_size: 20
+        format_sql: true
+        use_sql_comments: true
+        session:
+          event:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 500
+    show-sql: true
+
+springdoc:
+  swagger-ui:
+    display-request-duration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,info,prometheus"
+  endpoint:
+    health:
+      show-details: always
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: false # 한 줄로 깔끔하게 모아보기
+      logging: slf4j
+jwt:
+  secret: "${JWT_SECRET:jwt-secret-key-for-local-environment-1234567890}"

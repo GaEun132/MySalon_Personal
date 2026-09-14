@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      maximum-pool-size: 32
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        highlight_sql: true
+        default_batch_fetch_size: 20
+        format_sql: true
+        generate_statistics: true
+        session:
+          event:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 500
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+jwt:
+  secret: "${JWT_SECRET:jwt-secret-key-for-local-environment-1234567890}"
+logging:
+  level:
+    root: INFO
+    org.hibernate: DEBUG
+    org.hibernate.stat: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL_SLOW: INFO
