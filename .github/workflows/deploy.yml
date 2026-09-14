@@ -47,6 +47,8 @@ jobs:
 
 
         # 현재 working directory에 있는 dockerfile을 가지고 이미지 빌드 후 ecr에 push
+        # lastest .은 dockerfile이 있는 현재 위치를 의미. dockerfile을 읽어서 image를 빌드.
+        # 이 단계에서는 docker-compose.yml을 읽지 않는다.
       - name: Build, Tag, and Push Image to Amazon ECR
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
@@ -54,7 +56,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}} \
                         -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-          
+        
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
@@ -74,6 +76,7 @@ jobs:
 
         #ec2에 ssh원격 접속해서 aws 권한 주입 및 ecr 로그인
         #.env파일 생성 해서 배포 환경 설정, 이미지 pull 및 컨테이너 실행, 사용하지 않는 이미지 삭제
+        # docker compose pull : docker-compose.yml에 정의된 이미지들을 pull한다.
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.6
         with:

@@ -1,8 +1,9 @@
 services:
 
   spring:
-    build: .  # 우리가 작성한 Dockerfile을 빌드한 이미지를 사용(.은 dockerfile의 위치)
+   # build: .  # 이 설정이 있으면 Dockerfile을 실행하여 build의 결과인 jar파일로 이미지를 생성해서 컨테이너를 띄운다.(.은 dockerfile의 위치)
     container_name: my-spring
+    image: ${ECR_REGISTRY_URI}:${IMAGE_TAG} # 이 설정이 있으면 이미지를 직접 생성하지 않고 docker pull로 해당 이미지를 다운로드한다.
     ports:
       - "8080:8080"
     environment:
