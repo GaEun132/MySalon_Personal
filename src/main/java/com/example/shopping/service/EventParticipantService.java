@@ -30,7 +30,7 @@ public class EventParticipantService {
     public EventParticipantDto.CreateEventParticipantResponse createEventParticipant(Long userId, EventParticipantDto.CreateEventParticipantRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        Event event = eventRepository.findById(request.getEventId())
+        Event event = eventRepository.findByIdWithPessimisticLock(request.getEventId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
 
         LocalDateTime now = LocalDateTime.now();
@@ -46,7 +46,7 @@ public class EventParticipantService {
         if (eventParticipantRepository.existsByUserUserIdAndEventEventId(user.getUserId(), event.getEventId())) {
             throw new BusinessException(ErrorCode.EVENT_ALREADY_PARTICIPATED);
         }
-
+        event.participate();
         EventParticipant eventParticipant = request.toEntity(user, event);
         EventParticipant savedEventParticipant = eventParticipantRepository.save(eventParticipant);
         return EventParticipantDto.CreateEventParticipantResponse.fromEntity(savedEventParticipant);
