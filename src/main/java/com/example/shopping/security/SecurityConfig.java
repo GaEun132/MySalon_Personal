@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/users/**").permitAll()
+                    auth.requestMatchers("/api/users/**","/api/event-participant/**").permitAll()
                             .requestMatchers("/swagger", "/swagger/", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 허용
                             .requestMatchers("/actuator/**").permitAll() // Actuator 허용
                             .requestMatchers("/products/images/**").permitAll()

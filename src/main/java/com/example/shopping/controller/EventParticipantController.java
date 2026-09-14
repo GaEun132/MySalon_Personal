@@ -15,8 +15,8 @@ public class EventParticipantController {
 
     private final EventParticipantService eventParticipantService;
 
-    @PostMapping
-    public ResponseEntity<EventParticipantDto.CreateEventParticipantResponse> createEventParticipant(@CurrentUser Long userId, @RequestBody EventParticipantDto.CreateEventParticipantRequest request) {
+    @PostMapping("/{userId}")
+    public ResponseEntity<EventParticipantDto.CreateEventParticipantResponse> createEventParticipant(@PathVariable Long userId, @RequestBody EventParticipantDto.CreateEventParticipantRequest request) {
         EventParticipantDto.CreateEventParticipantResponse response = eventParticipantService.createEventParticipant(userId, request);
         return ResponseEntity.ok(response);
     }
