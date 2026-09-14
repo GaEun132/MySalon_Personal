@@ -97,7 +97,9 @@ jobs:
             echo "${{secrets.ENV_FILE_BASE64}}" | base64 -d > .env
             echo "ECR_REGISTRY_URI=${{steps.login-ecr.outputs.registry}}/shopping-ecr" >> .env
             echo "IMAGE_TAG=${{env.IMAGE_TAG}}" >> .env     
-        
+            
+            echo "${{secrets.PROMETHEUS_YML_BASE64}}" | base64 -d > prometheus.yml
+            
             docker compose pull                     
                                                        
             docker compose up -d --remove-orphans    

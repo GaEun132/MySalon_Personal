@@ -7,4 +7,4 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       # Mac/Windows의 경우 host.docker.internal을 사용해 로컬 스프링 앱에 접근
-      - targets: ['host.docker.internal:8080']
+      - targets: ['spring:8080']
