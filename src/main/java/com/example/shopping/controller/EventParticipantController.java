@@ -20,6 +20,12 @@ public class EventParticipantController {
         EventParticipantDto.CreateEventParticipantResponse response = eventParticipantService.createEventParticipant(userId, request);
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/v1/{userId}")
+    public ResponseEntity<EventParticipantDto.CreateEventParticipantResponse> createEventParticipantWithRedis(@PathVariable Long userId, @RequestBody EventParticipantDto.CreateEventParticipantRequest request) {
+        EventParticipantDto.CreateEventParticipantResponse response = eventParticipantService.createEventParticipantWithRedis(userId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     public ResponseEntity<EventParticipantDto.UserParticipateEventListResponse> getUserParticipateEvents(@CurrentUser Long userId, @RequestParam int page) {
         EventParticipantDto.UserParticipateEventListResponse response = eventParticipantService.getUserParticipateEvents(userId, page);

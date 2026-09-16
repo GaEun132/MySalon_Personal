@@ -17,10 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final EventIssuer eventIssuer;
     @Transactional
     public EventDto.CreateEventResponse createEvent(EventDto.CreateEventRequest request) {
         Event event = request.toEntity();
         Event savedEvent = eventRepository.save(event);
+        return EventDto.CreateEventResponse.fromEntity(savedEvent);
+    }
+    @Transactional
+    public EventDto.CreateEventResponse createEventWithRedis(EventDto.CreateEventRequest request) {
+        Event event = request.toEntity();
+        Event savedEvent = eventRepository.save(event);
+        // 이벤트 생성시 { key: event:eventId:capacity, value: capacity} 를 레디스에 저장
+        eventIssuer.initCapacity(savedEvent.getEventId(), event.getMaxParticipant());
         return EventDto.CreateEventResponse.fromEntity(savedEvent);
     }
     @Transactional(readOnly = true)

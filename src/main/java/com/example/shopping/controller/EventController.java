@@ -21,6 +21,11 @@ public class EventController {
         EventDto.CreateEventResponse response =  eventService.createEvent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+    @PostMapping("/v1")
+    public ResponseEntity<EventDto.CreateEventResponse> createEventWithRedis(@RequestBody EventDto.CreateEventRequest request) {
+        EventDto.CreateEventResponse response =  eventService.createEventWithRedis(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventDto.GetEventInfoResponse> getEventInfo(@PathVariable Long eventId) {

@@ -75,7 +75,7 @@ public class CouponIssuer {
     }
     // 쿠폰 정보 생성시 재고를 초기화
     public void initStock(Long couponId, Integer totalQuantity) {
-        // set 연산 실행 {key: couponId, value: totalQuantity}
+        // set 연산 실행 {key: coupon:couponId:stock, value: totalQuantity}
         redisTemplate.opsForValue().set(stockKey(couponId), String.valueOf(totalQuantity));
     }
 

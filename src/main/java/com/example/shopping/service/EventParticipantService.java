@@ -26,6 +26,8 @@ public class EventParticipantService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final EventParticipantRepository eventParticipantRepository;
+    private final EventIssuer eventIssuer;
+
     @Transactional
     public EventParticipantDto.CreateEventParticipantResponse createEventParticipant(Long userId, EventParticipantDto.CreateEventParticipantRequest request) {
         User user = userRepository.findById(userId)
@@ -64,6 +66,38 @@ public class EventParticipantService {
             throw new BusinessException(ErrorCode.EVENT_PARTICIPANT_NOT_FOUND);
         }
         eventParticipantRepository.deleteById(eventParticipantId);
+    }
+
+    @Transactional
+    public EventParticipantDto.CreateEventParticipantResponse createEventParticipantWithRedis(Long userId, EventParticipantDto.CreateEventParticipantRequest request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        // 이벤트 조회
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (!event.isParticipatingAvailable(now)) {
+            throw new BusinessException(ErrorCode.EVENT_NOT_STARTED);
+        }
+        if (event.isEnded(now)) {
+            throw new BusinessException(ErrorCode.EVENT_ENDED);
+        }
+        // 중복 참가 여부 확인
+        if (eventParticipantRepository.existsByUserUserIdAndEventEventId(user.getUserId(), event.getEventId())) {
+            throw new BusinessException(ErrorCode.EVENT_ALREADY_PARTICIPATED);
+        }
+        // 레디스에서 수용인원 증가
+        eventIssuer.tryParticipate(event.getEventId());
+        // 현재 참가자 수 증가
+        eventParticipantRepository.increaseCurrentParticipant(event.getEventId());
+
+
+        EventParticipant eventParticipant = request.toEntity(user, event);
+        EventParticipant savedEventParticipant = eventParticipantRepository.save(eventParticipant);
+        return EventParticipantDto.CreateEventParticipantResponse.fromEntity(savedEventParticipant);
+
     }
 }
 
