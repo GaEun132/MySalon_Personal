@@ -28,15 +28,15 @@ public class CouponController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{couponId}/issue")
-    public ResponseEntity<IssuanceDto.IssueResponse> issueCoupon(@CurrentUser Long userId, @PathVariable Long couponId) {
+    @PostMapping("/{couponId}/issue/{userId}")
+    public ResponseEntity<IssuanceDto.IssueResponse> issueCoupon(@PathVariable Long userId, @PathVariable Long couponId) {
         IssuanceDto.IssueResponse response = couponService.issueCoupon(userId, couponId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
 
-    @PostMapping("/{couponId}/issue/redis")
-    public ResponseEntity<IssuanceDto.IssueResponse> issueCouponWithRedis(@CurrentUser Long userId, @PathVariable Long couponId) {
+    @PostMapping("/{couponId}/issue/{userId}/redis")
+    public ResponseEntity<IssuanceDto.IssueResponse> issueCouponWithRedis(@PathVariable Long userId, @PathVariable Long couponId) {
         IssuanceDto.IssueResponse response = couponService.issueCouponWithRedis(userId, couponId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
