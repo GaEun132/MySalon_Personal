@@ -99,5 +99,33 @@ public class EventParticipantService {
         return EventParticipantDto.CreateEventParticipantResponse.fromEntity(savedEventParticipant);
 
     }
+
+    @Transactional
+    public EventParticipantDto.CreateEventParticipantResponse createEventParticipantWithRedisDuplicateCheck(Long userId, EventParticipantDto.CreateEventParticipantRequest request) {
+        // 유저 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        // 이벤트 조회
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (!event.isParticipatingAvailable(now)) {
+            throw new BusinessException(ErrorCode.EVENT_NOT_STARTED);
+        }
+        if (event.isEnded(now)) {
+            throw new BusinessException(ErrorCode.EVENT_ENDED);
+        }
+        // 레디스에서 수용인원 조회, 중복 참가 여부 확인
+        eventIssuer.tryParticipateWithDuplicateCheck(event.getEventId(),userId);
+        // 현재 참가자 수 증가
+        eventParticipantRepository.increaseCurrentParticipant(event.getEventId());
+
+
+        EventParticipant eventParticipant = request.toEntity(user, event);
+        EventParticipant savedEventParticipant = eventParticipantRepository.save(eventParticipant);
+        return EventParticipantDto.CreateEventParticipantResponse.fromEntity(savedEventParticipant);
+
+    }
 }
 
